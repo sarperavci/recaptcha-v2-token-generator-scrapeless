@@ -1,0 +1,30 @@
+{
+    "name": "captcha-token-generator",
+    "version": "1.0.0",
+    "description": "Backend service to continuously generate CAPTCHA tokens",
+    "main": "server.js",
+    "type": "module",
+    "scripts": {
+      "start": "node server.js",
+      "dev": "nodemon server.js"
+    },
+    "env": {
+      "ENABLE_ASYNC_GENERATION": "true or false, enables async token generation",
+      "MAX_CONCURRENT_GENERATIONS": "max concurrent async generations (default 3)",
+      "ASYNC_GENERATION_BATCH_SIZE": "tokens to generate per async batch (default 2)",
+      "MAX_TOKENS": "max tokens to keep in memory (default 10)",
+      "GENERATION_INTERVAL": "interval in ms between token generations (default 30000)"
+    },
+    "dependencies": {
+      "express": "^4.18.2",
+      "puppeteer-core": "^21.5.2",
+      "cors": "^2.8.5",
+      "dotenv": "^16.3.1"
+    },
+    "devDependencies": {
+      "nodemon": "^3.0.1"
+    },
+    "keywords": ["captcha", "puppeteer", "backend", "api"],
+    "author": "",
+    "license": "MIT"
+  }

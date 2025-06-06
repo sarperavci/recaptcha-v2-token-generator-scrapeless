@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAPTCHA Token Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: slideDown 1s ease-out;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .status-icon { background: linear-gradient(45deg, #4CAF50, #45a049); }
+        .token-icon { background: linear-gradient(45deg, #2196F3, #1976D2); }
+        .control-icon { background: linear-gradient(45deg, #FF9800, #F57C00); }
+
+        .card h2 {
+            font-size: 1.5rem;
+            color: #333;
+            margin: 0;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0,0,0,0.03);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            background: rgba(0,0,0,0.06);
+            transform: scale(1.02);
+        }
+
+        .status-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+
+        .status-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.success {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+        }
+
+        .btn.danger {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(45deg, #6c757d, #5a6268);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .token-display {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .token-display.has-token {
+            background: linear-gradient(45deg, #e8f5e8, #f0f8f0);
+            border-color: #4CAF50;
+        }
+
+        .token-text {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .token-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .token-info-item {
+            background: rgba(0,0,0,0.05);
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .token-info-label {
+            font-size: 0.8rem;
+            color: #666;
+            display: block;
+        }
+
+        .token-info-value {
+            font-weight: bold;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .tokens-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .token-item {
+            background: rgba(0,0,0,0.03);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .token-item:hover {
+            background: rgba(0,0,0,0.06);
+        }
+
+        .token-item.used {
+            opacity: 0.6;
+            background: rgba(255,0,0,0.1);
+        }
+
+        .token-item.expired {
+            opacity: 0.4;
+            background: rgba(255,165,0,0.1);
+        }
+
+        .token-details {
+            flex: 1;
+        }
+
+        .token-id {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .token-time {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .token-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .token-status.active {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .token-status.used {
+            background: #f44336;
+            color: white;
+        }
+
+        .token-status.expired {
+            background: #FF9800;
+            color: white;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success { background: #4CAF50; }
+        .notification.error { background: #f44336; }
+        .notification.info { background: #2196F3; }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> CAPTCHA Token Generator</h1>
+            <p>Advanced Google reCAPTCHA v2 token generation with real-time monitoring</p>
+            <div style="margin-top: 10px;">
+                <a href="https://scrapeless.com" target="_blank" style="display: inline-block; background: linear-gradient(90deg,#667eea,#764ba2); color: #fff; font-weight: bold; padding: 6px 18px; border-radius: 20px; text-decoration: none; font-size: 1rem; box-shadow: 0 2px 8px rgba(102,126,234,0.15); letter-spacing: 1px;">
+                    Powered by scrapeless.com
+                </a>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon status-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h2>Service Status</h2>
+                </div>
+                
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-value" id="serviceStatus">●</span>
+                        <div class="status-label">Service</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-value" id="browserStatus">●</span>
+                        <div class="status-label">Browser</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-value" id="tokenCount">0</span>
+                        <div class="status-label">Available Tokens</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-value" id="totalTokens">0</span>
+                        <div class="status-label">Total Generated</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-value" id="asyncMode">●</span>
+                        <div class="status-label">Generation Mode</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-value" id="activeGenerations">0</span>
+                        <div class="status-label">Active Generations</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn success" onclick="startService()" id="startBtn">
+                        <i class="fas fa-play"></i> Start Service
+                    </button>
+                    <button class="btn danger" onclick="stopService()" id="stopBtn">
+                        <i class="fas fa-stop"></i> Stop Service
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon token-icon">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <h2>Token Management</h2>
+                </div>
+
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <button class="btn" onclick="getToken()" id="getTokenBtn">
+                        <i class="fas fa-download"></i> Get Token
+                    </button>
+                    <button class="btn secondary" onclick="generateToken()" id="generateBtn">
+                        <i class="fas fa-cog"></i> Generate New
+                    </button>
+                </div>
+
+                <div class="token-display" id="tokenDisplay">
+                    <i class="fas fa-info-circle" style="color: #666; margin-bottom: 10px;"></i>
+                    <div>Click "Get Token" to retrieve an available CAPTCHA token</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon control-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h2>Live Monitoring</h2>
+                </div>
+
+                <div class="tokens-list" id="tokensList">
+                    <div style="text-align: center; color: #666; padding: 20px;">
+                        <i class="fas fa-clock"></i>
+                        <div>Token activity will appear here...</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="btn secondary" onclick="refreshStatus()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        let statusInterval;
+        let isServiceRunning = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshStatus();
+            startStatusMonitoring();
+        });
+
+        function startStatusMonitoring() {
+            if (statusInterval) clearInterval(statusInterval);
+            statusInterval = setInterval(refreshStatus, 2000);
+        }
+
+        function stopStatusMonitoring() {
+            if (statusInterval) {
+                clearInterval(statusInterval);
+                statusInterval = null;
+            }
+        }
+
+        async function refreshStatus() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatusDisplay(data.status);
+                }
+            } catch (error) {
+                console.error('Error fetching status:', error);
+                showNotification('Failed to fetch status', 'error');
+            }
+        }
+
+        function updateStatusDisplay(status) {
+            const serviceEl = document.getElementById('serviceStatus');
+            const browserEl = document.getElementById('browserStatus');
+            const asyncEl = document.getElementById('asyncMode');
+            const activeGenEl = document.getElementById('activeGenerations');
+            serviceEl.textContent = status.isRunning ? '🟢' : '🔴';
+            serviceEl.style.color = status.isRunning ? '#4CAF50' : '#f44336';
+            browserEl.textContent = status.browserConnected ? '🟢' : '🔴';
+            browserEl.style.color = status.browserConnected ? '#4CAF50' : '#f44336';
+            if (status.asyncGeneration) {
+                if (status.asyncGeneration.enabled) {
+                    asyncEl.textContent = '⚡';
+                    asyncEl.style.color = '#FF9800';
+                    asyncEl.parentElement.querySelector('.status-label').textContent = `Async (${status.asyncGeneration.maxConcurrent})`;
+                } else {
+                    asyncEl.textContent = '🔄';
+                    asyncEl.style.color = '#2196F3';
+                    asyncEl.parentElement.querySelector('.status-label').textContent = 'Sequential';
+                }
+                activeGenEl.textContent = status.asyncGeneration.activeGenerations || 0;
+                activeGenEl.style.color = status.asyncGeneration.activeGenerations > 0 ? '#FF9800' : '#666';
+            } else {
+                asyncEl.textContent = '●';
+                asyncEl.style.color = '#666';
+                asyncEl.parentElement.querySelector('.status-label').textContent = 'Unknown';
+                activeGenEl.textContent = 0;
+                activeGenEl.style.color = '#666';
+            }
+            document.getElementById('tokenCount').textContent = status.tokenCount || 0;
+            document.getElementById('totalTokens').textContent = status.totalTokens || 0;
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            if (status.isRunning) {
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                startBtn.style.opacity = '0.6';
+                stopBtn.style.opacity = '1';
+            } else {
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                startBtn.style.opacity = '1';
+                stopBtn.style.opacity = '0.6';
+            }
+            isServiceRunning = status.isRunning;
+            updateTokensList(status.tokens || []);
+        }
+
+        function updateTokensList(tokens) {
+            const container = document.getElementById('tokensList');
+            if (!tokens || tokens.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 20px;">
+                        <i class="fas fa-clock"></i>
+                        <div>No tokens available</div>
+                    </div>
+                `;
+                return;
+            }
+            const tokensHtml = tokens.map(token => {
+                const isExpired = token.timeRemaining <= 0;
+                const statusClass = token.isUsed ? 'used' : (isExpired ? 'expired' : 'active');
+                const statusText = token.isUsed ? 'USED' : (isExpired ? 'EXPIRED' : `${token.timeRemaining}s`);
+                const statusColor = token.isUsed ? 'used' : (isExpired ? 'expired' : 'active');
+                return `
+                    <div class="token-item ${statusClass}">
+                        <div class="token-details">
+                            <div class="token-id">Token #${token.id}</div>
+                            <div class="token-time">Created: ${new Date(token.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                        <div class="token-status ${statusColor}">${statusText}</div>
+                    </div>
+                `;
+            }).join('');
+            container.innerHTML = tokensHtml;
+        }
+
+        async function startService() {
+            const btn = document.getElementById('startBtn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<div class="loading"></div> Starting...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('/start', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification('Service started successfully!', 'success');
+                    refreshStatus();
+                } else {
+                    showNotification(data.message || 'Failed to start service', 'error');
+                }
+            } catch (error) {
+                console.error('Error starting service:', error);
+                showNotification('Failed to start service', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function stopService() {
+            const btn = document.getElementById('stopBtn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<div class="loading"></div> Stopping...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('/stop', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification('Service stopped successfully!', 'success');
+                    refreshStatus();
+                } else {
+                    showNotification(data.message || 'Failed to stop service', 'error');
+                }
+            } catch (error) {
+                console.error('Error stopping service:', error);
+                showNotification('Failed to stop service', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function getToken() {
+            const btn = document.getElementById('getTokenBtn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<div class="loading"></div> Getting Token...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('/token');
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayToken(data);
+                    showNotification('Token retrieved successfully!', 'success');
+                    refreshStatus();
+                } else {
+                    showNotification(data.message || 'No tokens available', 'error');
+                    clearTokenDisplay();
+                }
+            } catch (error) {
+                console.error('Error getting token:', error);
+                showNotification('Failed to get token', 'error');
+                clearTokenDisplay();
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function generateToken() {
+            const btn = document.getElementById('generateBtn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<div class="loading"></div> Generating...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('/generate', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification('Token generated successfully!', 'success');
+                    refreshStatus();
+                } else {
+                    showNotification(data.message || 'Failed to generate token', 'error');
+                }
+            } catch (error) {
+                console.error('Error generating token:', error);
+                showNotification('Failed to generate token', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function displayToken(tokenData) {
+            const display = document.getElementById('tokenDisplay');
+            const expiresAt = new Date(tokenData.expiresAt);
+            const timeRemaining = Math.max(0, Math.floor((expiresAt - new Date()) / 1000));
+            
+            display.className = 'token-display has-token pulse';
+            display.innerHTML = `
+                <i class="fas fa-key" style="color: #4CAF50; margin-bottom: 10px; font-size: 1.5rem;"></i>
+                <div style="font-weight: bold; color: #4CAF50; margin-bottom: 10px;">Token Retrieved!</div>
+                <div class="token-text">${tokenData.token}</div>
+                <div class="token-info">
+                    <div class="token-info-item">
+                        <span class="token-info-label">ID</span>
+                        <span class="token-info-value">#${tokenData.id}</span>
+                    </div>
+                    <div class="token-info-item">
+                        <span class="token-info-label">Expires In</span>
+                        <span class="token-info-value">${timeRemaining}s</span>
+                    </div>
+                    <div class="token-info-item">
+                        <span class="token-info-label">Remaining</span>
+                        <span class="token-info-value">${tokenData.remainingTokens}</span>
+                    </div>
+                </div>
+                <button class="btn secondary" onclick="copyToken('${tokenData.token}')" style="margin-top: 15px;">
+                    <i class="fas fa-copy"></i> Copy Token
+                </button>
+            `;
+            
+            setTimeout(() => {
+                display.classList.remove('pulse');
+            }, 2000);
+        }
+
+        function clearTokenDisplay() {
+            const display = document.getElementById('tokenDisplay');
+            display.className = 'token-display';
+            display.innerHTML = `
+                <i class="fas fa-info-circle" style="color: #666; margin-bottom: 10px;"></i>
+                <div>Click "Get Token" to retrieve an available CAPTCHA token</div>
+            `;
+        }
+
+        function copyToken(token) {
+            navigator.clipboard.writeText(token).then(() => {
+                showNotification('Token copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy token', 'error');
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        window.addEventListener('beforeunload', function() {
+            stopStatusMonitoring();
+        });
+    </script>
+</body>
