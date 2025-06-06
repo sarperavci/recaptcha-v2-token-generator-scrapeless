@@ -12,6 +12,7 @@ This project demonstrates the power of [scrapeless.com](https://scrapeless.com) 
 
 ## Screenshot
 
+![](https://github.com/user-attachments/assets/fb8db593-81d5-428a-ae10-11068e59d17c)
 
 ## Frontend Dashboard
 
