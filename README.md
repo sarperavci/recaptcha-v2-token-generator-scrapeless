@@ -43,6 +43,7 @@ ASYNC_GENERATION_BATCH_SIZE=2
 MAX_TOKENS=10
 GENERATION_INTERVAL=30000
 PORT=3000
+CAPTCHA_PAGE_URL=https://recaptcha-demo.appspot.com/recaptcha-v2-checkbox-explicit.php
 ```
 
 - `SCRAPELESS_TOKEN`: Your scrapeless.com API token
@@ -52,6 +53,7 @@ PORT=3000
 - `MAX_TOKENS`: Max tokens to keep in memory
 - `GENERATION_INTERVAL`: Interval (ms) between token generations
 - `PORT`: Server port
+- `CAPTCHA_PAGE_URL`: The URL of the reCAPTCHA v2 page to solve (default: Google demo page, can be any compatible reCAPTCHA v2 site)
 
 ### Running the Service
 

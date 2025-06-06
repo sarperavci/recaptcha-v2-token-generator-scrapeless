@@ -86,7 +86,8 @@ class CaptchaService extends EventEmitter {
     try {
       page = await this.browser.newPage();
       const captchaPromise = this.addCaptchaListener(page);
-      await page.goto("https://recaptcha-demo.appspot.com/recaptcha-v2-checkbox-explicit.php", {timeout: 30000, waitUntil: "domcontentloaded"});
+      const url = process.env.CAPTCHA_PAGE_URL || "https://recaptcha-demo.appspot.com/recaptcha-v2-checkbox-explicit.php";
+      await page.goto(url, {timeout: 30000, waitUntil: "domcontentloaded"});
       const captchaResult = await this.onCaptchaFinished(captchaPromise);
       const token = {
         id: Date.now(),

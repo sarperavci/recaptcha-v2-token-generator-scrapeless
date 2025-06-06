@@ -31,7 +31,8 @@ app.get('/', (req, res) => {
       'POST /start': 'Start token generation',
       'POST /stop': 'Stop token generation',
       'POST /generate': 'Generate a single token manually'
-    }
+    },
+    captchaPageUrl: process.env.CAPTCHA_PAGE_URL || 'https://recaptcha-demo.appspot.com/recaptcha-v2-checkbox-explicit.php'
   });
 });
 
