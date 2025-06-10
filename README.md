@@ -312,7 +312,7 @@ result = scrapeless.scraper(
 
 ## Why Choose Scrapeless
 
-image.png
+[![](https://github.com/user-attachments/assets/783ce396-fa8c-4e10-846e-86d0ba0d0144)](https://app.scrapeless.com/passport/login?utm_source=github&utm_campaign=sarperavci)
 
 - **Scraping Browser**: Powerful cloud browser with stealth mode to bypass restrictions. Supports high concurrency, automation, and bulk scraping. Enables Crawl, and Extract.
 - **Crawl**: Supports scalable single-page and recursive crawling, with flexible output formats including JSON, Markdown, Metadata, HTML, links, and screenshots. Billed by actual data usage ($1.8/GB), ensuring you pay only for results that matter.
